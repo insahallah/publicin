@@ -1,0 +1,13 @@
+{
+    "appName": "Public Sewa",
+    "searchPlaceholder": "Search services, jobs...",
+    "viewAll": "View All",
+    "postJobTitle": "Post a New Job",
+    "postJobSubtitle": "List your work and get connected",
+    "post": "Post",
+    "error": {
+      "loadCategories": "Failed to load categories.",
+      "network": "Network error. Please try again later."
+    }
+  }
+  

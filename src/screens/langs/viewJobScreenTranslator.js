@@ -1,0 +1,36 @@
+const ViewJobScreenTranslator = {
+  en: {
+    overview: 'Overview',
+    reviews: 'Reviews',
+    services: 'Services',
+    quickInfo: 'Quick Info',
+    description: 'Description',
+    address: 'Address',
+    photos: 'Photos',
+    call: 'Call',
+    whatsapp: 'WhatsApp',
+    direction: 'Direction',
+    reviewsAndRatings: 'Reviews & Ratings',
+    noReviews: 'No reviews yet.',
+    servicesNotAvailable: 'Services information not available.',
+    quickInfoContent: 'Quick info will be shown here.',
+  },
+  hi: {
+    overview: 'सामान्य जानकारी',
+    reviews: 'समीक्षाएं',
+    services: 'सेवाएं',
+    quickInfo: 'त्वरित जानकारी',
+    description: 'विवरण',
+    address: 'पता',
+    photos: 'फोटो',
+    call: 'कॉल करें',
+    whatsapp: 'व्हाट्सएप',
+    direction: 'दिशा-निर्देश',
+    reviewsAndRatings: 'समीक्षा और रेटिंग',
+    noReviews: 'अभी तक कोई समीक्षा नहीं है।',
+    servicesNotAvailable: 'सेवाओं की जानकारी उपलब्ध नहीं है।',
+    quickInfoContent: 'यहां त्वरित जानकारी दिखाई जाएगी।',
+  },
+};
+
+export default ViewJobScreenTranslator;

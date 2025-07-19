@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 1. Solid blue background -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/splash_background"/>
+        </shape>
+    </item>
+    
+    <!-- 2. App logo (using mipmap) -->
+    <item android:gravity="center">
+        <bitmap
+            android:gravity="center"
+            android:src="@mipmap/app_logo"
+            android:width="200dp"
+            android:height="200dp"/>
+    </item>
+    
+    <!-- 3. Powered By text -->
+    <item android:gravity="bottom|center" android:bottom="40dp">
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/powered_by_text1"
+            android:width="180dp"
+            android:height="30dp"/>
+    </item>
+</layer-list>
