@@ -1,15 +1,15 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
   ActivityIndicator,
-  Alert,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { showMessage } from "react-native-flash-message";
 import { BASE_URL } from '../BaseUrl';
 
 const WriteReviewScreen = ({ route, navigation }) => {
@@ -19,19 +19,14 @@ const WriteReviewScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [user_id, setId] = useState();
 
-    useEffect(() => {
-      
-        loadUserID();
-   
-    }, []);
+  useEffect(() => {
+    loadUserID();
+  }, []);
 
-    const loadUserID = async () => {
+  const loadUserID = async () => {
     try {
       const id = await AsyncStorage.getItem('id');
-     
-        setId(id);
-   
-
+      setId(id);
     } catch (err) {
       console.error(err);
     }
@@ -39,7 +34,11 @@ const WriteReviewScreen = ({ route, navigation }) => {
 
   const handleSubmitReview = async () => {
     if (!reviewText.trim() || rating === 0) {
-      Alert.alert('Validation', 'Please enter a review and select a rating.');
+      showMessage({
+        message: 'Please enter a review and select a rating.',
+        type: 'warning',
+        icon: 'warning',
+      });
       return;
     }
 
@@ -61,17 +60,27 @@ const WriteReviewScreen = ({ route, navigation }) => {
       const data = await response.json();
       setLoading(false);
 
-      console.log(response);
-
       if (response.ok && data.status === 'success') {
-        Alert.alert('Success', 'Your review has been submitted.');
+        showMessage({
+          message: 'Your review has been submitted.',
+          type: 'success',
+          icon: 'success',
+        });
         navigation.goBack();
       } else {
-        Alert.alert('Error', data.message || 'Failed to submit review.');
+        showMessage({
+          message: data.message || 'Failed to submit review.', 
+          type: 'danger',
+          icon: 'danger',
+        });
       }
     } catch (error) {
       console.error('Submit Error:', error);
-      Alert.alert('Error', 'Could not submit review.');
+      showMessage({
+        message: 'Could not submit review.',
+        type: 'danger',
+        icon: 'danger',
+      });
       setLoading(false);
     }
   };

@@ -23,48 +23,63 @@ const ChooseLanguageScreen = ({ navigation }) => {
   const titleSlide = useRef(new Animated.Value(50)).current;
 
   useEffect(() => {
-    // Entry animations
-    Animated.parallel([
-      // Fade in content
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      // Slide up title
-      Animated.timing(titleSlide, {
-        toValue: 0,
-        duration: 800,
-        easing: Easing.out(Easing.back(1.2)),
-        useNativeDriver: true,
-      }),
-      // Globe rotation
-      Animated.loop(
-        Animated.timing(globeRotate, {
+    const checkLanguage = async () => {
+      try {
+        const savedLang = await AsyncStorage.getItem('appLanguage');
+        if (savedLang) {
+          // ✅ Already chosen → skip this screen
+          navigation.replace('MainApp');
+          return;
+        }
+      } catch (e) {
+        console.error('Error reading language:', e);
+      }
+
+      // Run animations only if no language is set
+      Animated.parallel([
+        // Fade in content
+        Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 24000,
-          easing: Easing.linear,
+          duration: 800,
           useNativeDriver: true,
-        })
-      ),
-      // Globe pulse
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(globePulse, {
+        }),
+        // Slide up title
+        Animated.timing(titleSlide, {
+          toValue: 0,
+          duration: 800,
+          easing: Easing.out(Easing.back(1.2)),
+          useNativeDriver: true,
+        }),
+        // Globe rotation
+        Animated.loop(
+          Animated.timing(globeRotate, {
             toValue: 1,
-            duration: 3000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(globePulse, {
-            toValue: 0,
-            duration: 3000,
-            easing: Easing.inOut(Easing.ease),
+            duration: 24000,
+            easing: Easing.linear,
             useNativeDriver: true,
           })
-        ])
-      )
-    ]).start();
+        ),
+        // Globe pulse
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(globePulse, {
+              toValue: 1,
+              duration: 3000,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+            Animated.timing(globePulse, {
+              toValue: 0,
+              duration: 3000,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            })
+          ])
+        )
+      ]).start();
+    };
+
+    checkLanguage();
   }, []);
 
   const handleLanguageSelect = async (lang) => {
@@ -89,25 +104,25 @@ const ChooseLanguageScreen = ({ navigation }) => {
     
     try {
       await AsyncStorage.setItem('appLanguage', lang);
-      navigation.replace('MainApp');
+      navigation.replace('MainApp'); // ✅ Jump after selection
     } catch (error) {
       console.error('Error saving language:', error);
     }
   };
 
-  // Animation interpolations
+  // ✅ Animation interpolations
   const rotate = globeRotate.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg']
+    outputRange: ['0deg', '360deg'],
   });
 
   const pulse = globePulse.interpolate({
     inputRange: [0, 1],
-    outputRange: [1, 1.02]
+    outputRange: [1, 1.02],
   });
 
   const titleTransform = {
-    transform: [{ translateY: titleSlide }]
+    transform: [{ translateY: titleSlide }],
   };
 
   return (

@@ -6,15 +6,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Picker } from '@react-native-picker/picker';
 import LoginScreenTranslator from './langs/LoginScreenTranslator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { showMessage } from "react-native-flash-message";
 import { BASE_URL } from './BaseUrl';
 
 const LoginScreen = ({ navigation }) => {
@@ -48,71 +47,95 @@ const LoginScreen = ({ navigation }) => {
   };
 
   const handleLogin = async () => {
-  if (!mobile || !password) {
-    Alert.alert(t.alertTitle, t.alertMsg);
-    return;
-  }
+    if (!mobile || !password) {
+      showMessage({
+        message: t.alertMsg,
+        type: 'warning',
+        icon: 'warning',
+      });
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const response = await fetch(`${BASE_URL}/api/login.php`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `mobile=${encodeURIComponent(mobile)}&password=${encodeURIComponent(password)}`,
-    });
-
-    const text = await response.text();
-    console.log('Raw login response:', text);
-
-    const data = JSON.parse(text);
-    console.log('Parsed login response:', data);
-    setLoading(false);
-
-    if (data.status === 'success') {
-      if (!data.name || !data.mobile || !data.id) {
-        Alert.alert('Login Failed', 'Missing user data in response.');
-        return;
-      }
-
-      try {
-        await AsyncStorage.setItem('user_image', String(data.profile_image));
-        await AsyncStorage.setItem('user_name', String(data.name));
-        await AsyncStorage.setItem('user_mobile', String(data.mobile));
-        await AsyncStorage.setItem('id', String(data.id));
-        await AsyncStorage.setItem('pin', String(data.pin || ''));
-        await AsyncStorage.setItem('user', JSON.stringify(data));
-      } catch (e) {
-        console.warn('Storage error:', e);
-        Alert.alert('Storage Error', 'Failed to save user data.');
-        return;
-      }
-
-      Alert.alert('Login Successful', `Welcome ${data.name}`);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'MainApp' }],
+    try {
+      const response = await fetch(`${BASE_URL}/api/login.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `mobile=${encodeURIComponent(mobile)}&password=${encodeURIComponent(password)}`,
       });
 
-    } else {
-      Alert.alert('Login Failed', data.message || 'Invalid credentials');
+      const text = await response.text();
+      console.log('Raw login response:', text);
+
+      const data = JSON.parse(text);
+      console.log('Parsed login response:', data);
+      setLoading(false);
+
+      if (data.status === 'success') {
+        if (!data.name || !data.mobile || !data.id) {
+          showMessage({
+            message: 'Login Failed: Missing user data in response.',
+            type: 'danger',
+            icon: 'danger',
+          });
+          return;
+        }
+
+        try {
+          await AsyncStorage.setItem('user_image', String(data.profile_image));
+          await AsyncStorage.setItem('user_name', String(data.name));
+          await AsyncStorage.setItem('user_mobile', String(data.mobile));
+          await AsyncStorage.setItem('id', String(data.id));
+          await AsyncStorage.setItem('pin', String(data.pin || ''));
+          await AsyncStorage.setItem('user', JSON.stringify(data));
+        } catch (e) {
+          console.warn('Storage error:', e);
+          showMessage({
+            message: 'Storage Error: Failed to save user data.',
+            type: 'danger',
+            icon: 'danger',
+          });
+          return;
+        }
+
+        showMessage({
+          message: `Welcome ${data.name}`,
+          type: 'success',
+          icon: 'success',
+        });
+
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainApp' }],
+        });
+
+      } else {
+        showMessage({
+          message: data.message || 'Invalid credentials',
+          type: 'danger',
+          icon: 'danger',
+        });
+      }
+
+    } catch (error) {
+      setLoading(false);
+      console.error('Login error:', error);
+      showMessage({
+        message: 'Something went wrong while logging in.',
+        type: 'danger',
+        icon: 'danger',
+      });
     }
+  };
 
-  } catch (error) {
-    setLoading(false);
-    console.error('Login error:', error);
-    Alert.alert('Error', 'Something went wrong while logging in.');
-  }
-};
-
-  // Correct handleBack function
   const handleBack = () => {
-    if (navigation.canGoBack()) {
-     
-      navigation.navigate('MainApp'); // fallback screen
-    }
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'MainApp' }],
+    });
   };
 
   return (
@@ -121,11 +144,8 @@ const LoginScreen = ({ navigation }) => {
 
       {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-       <Icon name="arrow-left" size={30} color="#fff" />
-
+        <Icon name="arrow-left" size={30} color="#fff" />
       </TouchableOpacity>
-
-
 
       <Animatable.View animation="fadeInDown" style={styles.header}>
         <Text style={styles.title}>{t.welcome}</Text>
@@ -133,7 +153,6 @@ const LoginScreen = ({ navigation }) => {
       </Animatable.View>
 
       <Animatable.View animation="fadeInUp" style={styles.card}>
-        <Text style={styles.label}></Text>
         <TextInput
           style={styles.input}
           placeholder={t.mobile}
@@ -144,7 +163,6 @@ const LoginScreen = ({ navigation }) => {
           autoCapitalize="none"
         />
 
-        <Text style={styles.label}></Text>
         <TextInput
           style={styles.input}
           placeholder={t.password}
@@ -176,29 +194,12 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  languagePickerWrapper: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 130,
-    zIndex: 10,
-  },
-  languagePicker: {
-    color: '#fff',
-    backgroundColor: 'transparent',
-  },
   backButton: {
     position: 'absolute',
     top: 40,
     left: 10,
     padding: 10,
     zIndex: 10,
-    fontWeight:'bold'
-  },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 25,
-    fontWeight:'bold'
   },
   header: {
     marginTop: 100,
@@ -222,11 +223,6 @@ const styles = StyleSheet.create({
     padding: 25,
     flex: 1,
   },
-  label: {
-    fontSize: 16,
-    marginTop: 15,
-    color: '#333',
-  },
   input: {
     height: 50,
     borderRadius: 12,
@@ -235,6 +231,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     backgroundColor: '#f9f9f9',
+    marginTop: 15,
   },
   button: {
     marginTop: 30,

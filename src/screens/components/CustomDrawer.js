@@ -74,7 +74,7 @@ const CustomDrawer = (props) => {
   const handleLogout = async () => {
     try {
       await AsyncStorage.multiRemove(['user', 'token', 'user_name', 'user_mobile', 'user_image', 'id']);
-      navigation.replace('LoginScreen');
+      navigation.replace('MainApp');
     } catch (error) {
       Alert.alert('Error', 'Logout failed');
     }

@@ -82,8 +82,8 @@ android {
         applicationId "com.publicin"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "1.8"
+        versionCode 50
+        versionName "50"
     }
     signingConfigs {
         release {

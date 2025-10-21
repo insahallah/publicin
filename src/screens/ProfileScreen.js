@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { showMessage } from "react-native-flash-message";
 
 const ProfileScreen = ({ navigation }) => {
   const [username, setUsername] = useState('Guest User');
@@ -18,7 +19,11 @@ const ProfileScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     await AsyncStorage.clear();
-    Alert.alert('Logged Out', 'You have been logged out successfully.');
+    showMessage({
+      message: 'You have been logged out successfully.',
+      type: 'success',
+      icon: 'success',
+    });
     navigation.replace('LoginScreen');
   };
 
